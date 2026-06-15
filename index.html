@@ -1,40 +1,1344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your App Name</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Curious Minds — The Operating System for Your Brain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-0: #08090F;
+    --bg-1: #0E1018;
+    --bg-2: #13141C;
+    --bg-3: #1A1B26;
+    --violet: #7B6FFF;
+    --violet-dim: #5A50CC;
+    --violet-glow: rgba(123,111,255,0.18);
+    --amber: #FFD166;
+    --mint: #4ECDC4;
+    --text-primary: #F0F0FF;
+    --text-secondary: #9091A0;
+    --text-muted: #5A5B6A;
+    --border: rgba(123,111,255,0.15);
+    --border-bright: rgba(123,111,255,0.4);
+  }
+
+  html { scroll-behavior: smooth; }
+
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: #0d1117;
-    color: #e6edf3;
+    background: var(--bg-0);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 48px;
+    background: rgba(8,9,15,0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(123,111,255,0.08);
+    transition: padding 0.3s ease;
+  }
+  nav.scrolled { padding: 12px 48px; }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav-logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--violet), #A78BFA);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text-primary); }
+
+  .nav-cta {
+    background: var(--violet);
+    color: #fff !important;
+    padding: 8px 20px;
+    border-radius: 8px;
+    transition: background 0.2s, transform 0.2s !important;
+  }
+  .nav-cta:hover { background: #6A60EE !important; transform: translateY(-1px); }
+
+  /* ── SECTION BASE ── */
+  section { position: relative; z-index: 1; }
+
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+  }
+
+  /* ── HERO ── */
+  #hero {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 24px;
+    padding: 120px 0 80px;
+    overflow: hidden;
   }
-  .container { max-width: 460px; text-align: center; }
-  h1 { font-size: 1.8rem; margin-bottom: 12px; }
-  p { color: #9da7b3; line-height: 1.6; margin-bottom: 24px; }
-  .btn {
-    display: inline-block;
-    padding: 12px 32px;
-    background: #2f81f7;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 6px;
+
+  .hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+  }
+  .hero-orb-1 {
+    width: 600px; height: 600px;
+    top: -100px; left: -200px;
+    background: radial-gradient(circle, rgba(123,111,255,0.22) 0%, transparent 70%);
+    animation: orbDrift 8s ease-in-out infinite alternate;
+  }
+  .hero-orb-2 {
+    width: 400px; height: 400px;
+    bottom: 0; right: -100px;
+    background: radial-gradient(circle, rgba(78,205,196,0.14) 0%, transparent 70%);
+    animation: orbDrift 10s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes orbDrift {
+    from { transform: translate(0, 0) scale(1); }
+    to   { transform: translate(40px, 30px) scale(1.08); }
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(123,111,255,0.1);
+    border: 1px solid var(--border-bright);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 0.75rem;
     font-weight: 600;
+    color: var(--violet);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow-dot {
+    width: 6px; height: 6px;
+    background: var(--violet);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2.6rem, 5vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    margin-bottom: 20px;
+  }
+  h1 .grad {
+    background: linear-gradient(90deg, var(--violet) 0%, #A78BFA 50%, var(--mint) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 480px;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--violet);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 26px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 0 0 rgba(123,111,255,0.4);
+  }
+  .btn-primary:hover {
+    background: #6A60EE;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(123,111,255,0.35);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 26px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--border-bright);
+    background: var(--violet-glow);
+    transform: translateY(-2px);
+  }
+
+  /* ── HERO CARD (SIGNATURE ELEMENT) ── */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    position: relative;
+  }
+
+  .card-stack {
+    position: relative;
+    width: 320px;
+    height: 420px;
+  }
+
+  .wisdom-card {
+    position: absolute;
+    width: 280px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    padding: 28px;
+    background: linear-gradient(145deg, #14152080 0%, #0E1018CC 100%);
+    backdrop-filter: blur(16px);
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+  }
+
+  .wisdom-card.card-back-2 {
+    top: 32px; left: 40px;
+    transform: rotate(6deg);
+    opacity: 0.4;
+    border-color: rgba(78,205,196,0.15);
+    z-index: 1;
+  }
+  .wisdom-card.card-back-1 {
+    top: 16px; left: 20px;
+    transform: rotate(3deg);
+    opacity: 0.65;
+    z-index: 2;
+  }
+  .wisdom-card.card-front {
+    top: 0; left: 0;
+    z-index: 3;
+    border-color: var(--border-bright);
+    box-shadow: 0 0 0 1px rgba(123,111,255,0.1), 0 24px 64px rgba(0,0,0,0.5), 0 0 80px rgba(123,111,255,0.12);
+    animation: cardFloat 4s ease-in-out infinite;
+  }
+  @keyframes cardFloat {
+    0%, 100% { transform: translateY(0) rotate(-1deg); }
+    50% { transform: translateY(-12px) rotate(-1deg); }
+  }
+
+  .card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(123,111,255,0.15);
+    border: 1px solid rgba(123,111,255,0.3);
+    border-radius: 100px;
+    padding: 4px 10px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--violet);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .card-icon {
+    font-size: 2.4rem;
+    margin-bottom: 14px;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+  }
+
+  .card-body {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .card-progress {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+  .card-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--violet), var(--mint));
+    border-radius: 100px;
+    width: 62%;
+    animation: progressPulse 3s ease-in-out infinite;
+  }
+  @keyframes progressPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+  }
+  .card-xp { color: var(--amber); font-weight: 600; }
+
+  /* Glow ring behind front card */
+  .card-glow {
+    position: absolute;
+    top: -20px; left: -20px;
+    width: 320px; height: 320px;
+    background: radial-gradient(circle, rgba(123,111,255,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.5; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  /* Floating badges around card */
+  .card-float-badge {
+    position: absolute;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    z-index: 10;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+  .float-badge-xp {
+    top: 20px; right: -60px;
+    color: var(--amber);
+    animation: badgeFloat 3s ease-in-out infinite;
+  }
+  .float-badge-streak {
+    bottom: 80px; right: -50px;
+    color: var(--mint);
+    animation: badgeFloat 3s ease-in-out 1.5s infinite;
+  }
+  @keyframes badgeFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* ── STATS BAR ── */
+  #stats {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-1);
+  }
+  .stats-inner {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .stat-item {
+    text-align: center;
+    padding: 24px 32px;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-number {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.04em;
+    display: block;
+  }
+  .stat-number .accent { color: var(--violet); }
+  .stat-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ── SECTION HEADINGS ── */
+  .section-pad { padding: 100px 0; }
+
+  .section-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+  }
+
+  .section-sub {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    max-width: 540px;
+  }
+
+  /* ── FEATURES ── */
+  #features { background: var(--bg-0); }
+
+  .features-header { margin-bottom: 64px; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--bg-1);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 20% 20%, var(--violet-glow) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .feature-card:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(123,111,255,0.08);
+  }
+  .feature-card:hover::before { opacity: 1; }
+
+  .feature-icon-wrap {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+  .icon-violet { background: rgba(123,111,255,0.15); }
+  .icon-amber  { background: rgba(255,209,102,0.12); }
+  .icon-mint   { background: rgba(78,205,196,0.12); }
+
+  .feature-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+  }
+
+  .feature-desc {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .feature-tag {
+    display: inline-block;
+    margin-top: 16px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+  }
+  .tag-pro {
+    background: rgba(255,209,102,0.12);
+    color: var(--amber);
+    border: 1px solid rgba(255,209,102,0.25);
+  }
+  .tag-free {
+    background: rgba(78,205,196,0.1);
+    color: var(--mint);
+    border: 1px solid rgba(78,205,196,0.2);
+  }
+
+  /* ── CURRICULUM ── */
+  #curriculum {
+    background: var(--bg-1);
+    overflow: hidden;
+  }
+
+  .curriculum-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .topic-chip {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: border-color 0.25s, transform 0.25s;
+    cursor: default;
+  }
+  .topic-chip:hover {
+    border-color: var(--border-bright);
+    transform: translateY(-2px);
+  }
+  .topic-emoji { font-size: 1.3rem; flex-shrink: 0; }
+  .topic-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+  .topic-block {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── COMMUNITY ── */
+  #community { background: var(--bg-0); }
+
+  .community-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .chat-mock {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    background: var(--bg-3);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chat-room-dot {
+    width: 8px; height: 8px;
+    background: var(--mint);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--mint);
+  }
+  .chat-room-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  .chat-room-count {
+    margin-left: auto;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .chat-messages {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .chat-msg {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .chat-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-weight: 600;
+    font-size: 0.75rem;
+  }
+  .av-1 { background: linear-gradient(135deg, var(--violet), #A78BFA); }
+  .av-2 { background: linear-gradient(135deg, #F59E0B, var(--amber)); }
+  .av-3 { background: linear-gradient(135deg, var(--mint), #26A69A); }
+
+  .msg-content { flex: 1; }
+  .msg-name {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .msg-text {
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 12px 12px 12px 4px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .chat-input-row {
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .chat-input-fake {
+    flex: 1;
+    background: var(--bg-3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .chat-send {
+    width: 36px; height: 36px;
+    background: var(--violet);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  /* ── PRICING ── */
+  #pricing {
+    background: var(--bg-1);
+  }
+  .pricing-header { margin-bottom: 56px; }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .price-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .price-card.featured {
+    border-color: var(--border-bright);
+    background: linear-gradient(145deg, #1A1B26 0%, #13141C 100%);
+    box-shadow: 0 0 60px rgba(123,111,255,0.12), 0 0 0 1px rgba(123,111,255,0.1);
+    position: relative;
+  }
+  .price-card.featured::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: 21px;
+    background: linear-gradient(135deg, rgba(123,111,255,0.5) 0%, transparent 50%, rgba(78,205,196,0.3) 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 1px;
+    pointer-events: none;
+  }
+
+  .price-badge {
+    display: inline-block;
+    background: var(--violet);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+  .price-plan {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .price-amount {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin: 16px 0 4px;
+  }
+  .price-amount .currency { font-size: 1.3rem; vertical-align: super; margin-right: 2px; }
+  .price-amount .period { font-size: 0.9rem; font-weight: 400; color: var(--text-muted); }
+  .price-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 28px; }
+
+  .price-divider {
+    height: 1px;
+    background: var(--border);
+    margin-bottom: 24px;
+  }
+
+  .price-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .price-features li {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .price-features li .check { color: var(--mint); flex-shrink: 0; font-size: 0.8rem; margin-top: 1px; }
+  .price-features li .cross { color: var(--text-muted); flex-shrink: 0; font-size: 0.8rem; }
+
+  .price-cta {
+    display: block;
+    text-align: center;
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .price-cta.primary {
+    background: var(--violet);
+    color: #fff;
+    border: none;
+  }
+  .price-cta.primary:hover {
+    background: #6A60EE;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(123,111,255,0.35);
+  }
+  .price-cta.outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .price-cta.outline:hover {
+    border-color: var(--border-bright);
+    background: var(--violet-glow);
+  }
+
+  /* ── FOOTER CTA ── */
+  #footer-cta {
+    background: var(--bg-0);
+    text-align: center;
+    padding: 120px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .footer-cta-orb {
+    position: absolute;
+    width: 700px; height: 700px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(circle, rgba(123,111,255,0.14) 0%, transparent 65%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .footer-cta-inner { position: relative; z-index: 1; }
+  #footer-cta h2 { margin-bottom: 16px; font-size: clamp(2rem, 4vw, 3.2rem); }
+  #footer-cta p { color: var(--text-secondary); margin-bottom: 40px; max-width: 480px; margin-left: auto; margin-right: auto; }
+  .footer-cta-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--bg-1);
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+  }
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .footer-logo {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .footer-links a {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text-secondary); }
+  .footer-copy {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ── COUNTER ANIMATION ── */
+  .count-up { display: inline; }
+
+  /* ── REDUCED MOTION ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    .reveal { opacity: 1; transform: none; }
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+
+    .hero-inner, .curriculum-layout, .community-inner, .pricing-grid {
+      grid-template-columns: 1fr;
+      gap: 48px;
+    }
+    .hero-visual { order: -1; }
+    .card-stack { margin: 0 auto; }
+    .stats-inner { grid-template-columns: 1fr; }
+    .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; }
+    .features-grid { grid-template-columns: 1fr; }
+    .float-badge-xp { right: -10px; }
+    .float-badge-streak { right: -10px; }
+  }
+
+  @media (max-width: 600px) {
+    .container { padding: 0 20px; }
+    #hero { padding-top: 100px; }
+    .hero-ctas { flex-direction: column; }
+    .pricing-grid { grid-template-columns: 1fr; }
+    .footer-inner { flex-direction: column; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
   }
 </style>
 </head>
 <body>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <span class="nav-logo-icon">🧠</span>
+    Curious Minds
+  </a>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#curriculum">Topics</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#pricing" class="nav-cta">Get the App</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
   <div class="container">
-    <h1>Your App Name</h1>
-    <p>A short description of what your app does.</p>
-    <a class="btn" href="https://play.google.com/store/apps/details?id=your.package.name">Get it on Google Play</a>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-eyebrow">
+          <span class="hero-eyebrow-dot"></span>
+          Now in English &amp; Hindi
+        </div>
+        <h1>The Operating System<br><span class="grad">for Your Brain.</span></h1>
+        <p class="hero-sub">Master mental health, cognitive psychology, philosophy, and advanced sciences — through gamified cards, daily quizzes, and a community of deep thinkers.</p>
+        <div class="hero-ctas">
+          <a href="#" class="btn-primary">
+            <span>▶</span> Android — Play Store
+          </a>
+          <a href="#" class="btn-primary" style="background: #1A1A2E; border: 1px solid var(--border-bright);">
+            <span>🍎</span> iOS — App Store
+          </a>
+          <a href="#curriculum" class="btn-ghost">Explore Curriculum →</a>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="card-glow"></div>
+        <div class="card-stack">
+          <!-- Back cards -->
+          <div class="wisdom-card card-back-2">
+            <span class="card-icon">⚡</span>
+            <div class="card-title">Quantum Basics</div>
+          </div>
+          <div class="wisdom-card card-back-1">
+            <span class="card-icon">🧬</span>
+            <div class="card-title">DNA &amp; Genetics</div>
+          </div>
+
+          <!-- Front card -->
+          <div class="wisdom-card card-front">
+            <div class="card-badge">
+              <span>●</span> Psychology
+            </div>
+            <span class="card-icon">🧠</span>
+            <div class="card-title">Cognitive Biases</div>
+            <div class="card-body">Your brain takes shortcuts. These mental shortcuts — called heuristics — are useful, but they introduce predictable errors in judgment that others can exploit.</div>
+            <div class="card-progress">
+              <div class="card-progress-bar"></div>
+            </div>
+            <div class="card-meta">
+              <span>62% complete</span>
+              <span class="card-xp">+120 XP</span>
+            </div>
+          </div>
+
+          <!-- Floating badges -->
+          <div class="card-float-badge float-badge-xp">
+            ⭐ Level 7 Unlocked
+          </div>
+          <div class="card-float-badge float-badge-streak">
+            🔥 14-day streak
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+</section>
+
+<!-- STATS -->
+<section id="stats">
+  <div class="container">
+    <div class="stats-inner">
+      <div class="stat-item reveal">
+        <span class="stat-number"><span class="count-up" data-target="100">0</span><span class="accent">+</span></span>
+        <div class="stat-label">Learning Topics</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-1">
+        <span class="stat-number"><span class="count-up" data-target="15">0</span><span class="accent">K+</span></span>
+        <div class="stat-label">Quiz Questions</div>
+      </div>
+      <div class="stat-item reveal reveal-delay-2">
+        <span class="stat-number" style="font-size: 1.8rem;">EN <span class="accent">&amp;</span> हिं</span>
+        <div class="stat-label">Native Bilingual Support</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="section-pad">
+  <div class="container">
+    <div class="features-header reveal">
+      <div class="section-eyebrow">Core Features</div>
+      <h2>Built Different.<br>Designed to Stick.</h2>
+      <p class="section-sub">Every feature is engineered to replace passive scrolling with active, rewarding learning.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon-wrap icon-violet">🧪</div>
+        <div class="feature-title">Scientist Mode</div>
+        <p class="feature-desc">Toggle advanced mathematics, neural scans, chemical formulas, and cognitive coefficients behind every concept. The deep layer is always one switch away.</p>
+        <span class="feature-tag tag-pro">PRO Feature</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon-wrap icon-amber">⚡</div>
+        <div class="feature-title">XP &amp; Streak System</div>
+        <p class="feature-desc">Earn Experience Points for every card read, quiz completed, and daily fact discovered. Watch your level climb and maintain your learning streak.</p>
+        <span class="feature-tag tag-free">Free to Use</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon-wrap icon-mint">💡</div>
+        <div class="feature-title">Daily Facts Hub</div>
+        <p class="feature-desc">Bite-sized daily trivia and mind-expanding statistics delivered fresh every morning. The smallest habit that builds the biggest curiosity.</p>
+        <span class="feature-tag tag-free">Free to Use</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-icon-wrap icon-violet">📚</div>
+        <div class="feature-title">Premium eBook Library</div>
+        <p class="feature-desc">A deep catalog of downloadable educational eBooks in English and Hindi — crafted for in-browser reading with a premium editorial feel.</p>
+        <span class="feature-tag tag-pro">PRO Feature</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-icon-wrap icon-amber">❓</div>
+        <div class="feature-title">"Do You Know Why?" Quizzes</div>
+        <p class="feature-desc">Don't just learn — verify. Topic-specific quizzes reveal whether you've truly absorbed the insight or just read the words.</p>
+        <span class="feature-tag tag-free">Free to Use</span>
+      </div>
+      <div class="feature-card reveal reveal-delay-3">
+        <div class="feature-icon-wrap icon-mint">💬</div>
+        <div class="feature-title">Chat Rooms &amp; Community</div>
+        <p class="feature-desc">Interest-based chat rooms where you debate Stoicism, compare scores, and find people on the same intellectual track as you.</p>
+        <span class="feature-tag tag-free">Free to Use</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURRICULUM -->
+<section id="curriculum" class="section-pad">
+  <div class="container">
+    <div class="curriculum-layout">
+      <div class="reveal">
+        <div class="section-eyebrow">The Curriculum</div>
+        <h2>From the Mind Inward.<br>To the Universe Outward.</h2>
+        <p class="section-sub" style="margin-bottom: 32px;">Curious Minds begins where every great journey should — with mental health — then expands into psychology, philosophy, and the hard sciences.</p>
+        <a href="#pricing" class="btn-primary">Start Learning Free →</a>
+      </div>
+      <div class="topic-grid reveal reveal-delay-1">
+        <div class="topic-chip"><span class="topic-emoji">🌊</span><div><div class="topic-name">Depression &amp; Anxiety</div><div class="topic-block">Mental Health</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🔥</span><div><div class="topic-name">Burnout &amp; Trauma</div><div class="topic-block">Mental Health</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🏔</span><div><div class="topic-name">Stoicism</div><div class="topic-block">Philosophy</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🌀</span><div><div class="topic-name">Existentialism</div><div class="topic-block">Philosophy</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🧠</span><div><div class="topic-name">Cognitive Biases</div><div class="topic-block">Psychology</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🛡</span><div><div class="topic-name">Manipulation Defense</div><div class="topic-block">Social Psychology</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🤖</span><div><div class="topic-name">Artificial Intelligence</div><div class="topic-block">Technology</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🔑</span><div><div class="topic-name">Cryptography</div><div class="topic-block">Technology</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🧬</span><div><div class="topic-name">DNA &amp; Genetics</div><div class="topic-block">Science</div></div></div>
+        <div class="topic-chip"><span class="topic-emoji">🌍</span><div><div class="topic-name">Climate Science</div><div class="topic-block">Science</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section id="community" class="section-pad">
+  <div class="container">
+    <div class="community-inner">
+      <!-- Chat mockup -->
+      <div class="chat-mock reveal">
+        <div class="chat-header">
+          <div class="chat-room-dot"></div>
+          <div class="chat-room-name"># philosophy-lounge</div>
+          <div class="chat-room-count">247 online</div>
+        </div>
+        <div class="chat-messages">
+          <div class="chat-msg">
+            <div class="chat-avatar av-1">AR</div>
+            <div class="msg-content">
+              <div class="msg-name">Aryan R.</div>
+              <div class="msg-text">Just finished the Absurdism module. Camus was right — you have to imagine Sisyphus happy 😂</div>
+            </div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-avatar av-2">SK</div>
+            <div class="msg-content">
+              <div class="msg-name">Sneha K. <span style="color: var(--amber); font-size:0.65rem; margin-left:4px;">● Lvl 12</span></div>
+              <div class="msg-text">The Stoicism card hit differently. Marcus Aurelius didn't have social media but he still had something to say about distraction lol</div>
+            </div>
+          </div>
+          <div class="chat-msg">
+            <div class="chat-avatar av-3">RM</div>
+            <div class="msg-content">
+              <div class="msg-name">Rahul M.</div>
+              <div class="msg-text">Scientist Mode is actually insane. The neuro-mapping behind Cognitive Dissonance... my brain hurts in the best way</div>
+            </div>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <div class="chat-input-fake">Share an insight...</div>
+          <div class="chat-send">➤</div>
+        </div>
+      </div>
+
+      <div class="reveal reveal-delay-1">
+        <div class="section-eyebrow">Community</div>
+        <h2>Learn Together.<br>Think Deeper.</h2>
+        <p class="section-sub" style="margin-bottom: 32px;">Don't learn in isolation. Curious Minds pairs every topic with a community of people working through the same ideas — in real time.</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:16px; margin-bottom:36px;">
+          <li style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-secondary);">
+            <span style="color:var(--mint); font-size:1rem;">◆</span> Interest-based Chat Rooms for every block
+          </li>
+          <li style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-secondary);">
+            <span style="color:var(--mint); font-size:1rem;">◆</span> Leaderboard to compare XP and streaks
+          </li>
+          <li style="display:flex; align-items:center; gap:12px; font-size:0.875rem; color:var(--text-secondary);">
+            <span style="color:var(--mint); font-size:1rem;">◆</span> Direct messaging with friends
+          </li>
+        </ul>
+        <a href="#pricing" class="btn-ghost">Join the Community →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="section-pad">
+  <div class="container">
+    <div class="pricing-header reveal" style="text-align:center;">
+      <div class="section-eyebrow">Pricing</div>
+      <h2>Start Free. Go Deeper.</h2>
+      <p class="section-sub" style="margin: 0 auto;">Curiosity shouldn't cost a fortune. The core experience is free — forever.</p>
+    </div>
+    <div class="pricing-grid">
+      <!-- Free -->
+      <div class="price-card reveal">
+        <div class="price-plan">Free</div>
+        <div class="price-amount">₹<span style="font-size:2.6rem;">0</span></div>
+        <div class="price-desc">Forever free. No credit card needed.</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> 60+ foundational learning topics</li>
+          <li><span class="check">✓</span> Daily Facts Hub access</li>
+          <li><span class="check">✓</span> XP &amp; streak system</li>
+          <li><span class="check">✓</span> Public community chat rooms</li>
+          <li><span class="check">✓</span> English &amp; Hindi support</li>
+          <li><span class="cross">✗</span> <span style="color:var(--text-muted)">Scientist Mode</span></li>
+          <li><span class="cross">✗</span> <span style="color:var(--text-muted)">Premium eBook library</span></li>
+        </ul>
+        <a href="https://play.google.com/store/apps/details?id=com.selfhelp.curiousminds&hl=en" class="price-cta outline">Download Free</a>
+      </div>
+
+      <!-- Pro -->
+      <div class="price-card featured reveal reveal-delay-1">
+        <div class="price-badge">⚡ Most Popular</div>
+        <div class="price-plan" style="color:var(--violet)">Curious Minds Pro</div>
+        <div class="price-amount" style="color:var(--text-primary)">
+          <span class="currency">₹</span>75<span class="period">/month</span>
+        </div>
+        <div class="price-desc">or ₹899/year — save 2 months free</div>
+        <div class="price-divider"></div>
+        <ul class="price-features">
+          <li><span class="check">✓</span> Everything in Free</li>
+          <li><span class="check">✓</span> <strong style="color:var(--text-primary)">100+ premium topics unlocked</strong></li>
+          <li><span class="check">✓</span> <strong style="color:var(--text-primary)">Scientist Mode</strong> — equations &amp; neural models</li>
+          <li><span class="check">✓</span> Full eBook library (EN + हिंदी)</li>
+          <li><span class="check">✓</span> Ad-free forever</li>
+          <li><span class="check">✓</span> Unlimited direct messaging</li>
+          <li><span class="check">✓</span> Priority feature access</li>
+        </ul>
+        <a href="#" class="price-cta primary">Unlock Pro — ₹75/mo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<section id="footer-cta">
+  <div class="footer-cta-orb"></div>
+  <div class="footer-cta-inner reveal">
+    <div class="section-eyebrow" style="margin-bottom: 20px;">Ready to Begin?</div>
+    <h2>Expand What You<br><span class="grad">Think You Know.</span></h2>
+    <p>Join thousands of explorers levelling up their understanding of the mind, the world, and everything in between.</p>
+    <div class="footer-cta-btns">
+      <a href="https://play.google.com/store/apps/details?id=com.selfhelp.curiousminds&hl=en" class="btn-primary">▶ Download for Android</a>
+     
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <span style="background: linear-gradient(135deg, var(--violet), #A78BFA); width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:12px;">🧠</span>
+        Curious Minds
+      </div>
+      <ul class="footer-links">
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Support</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="footer-copy">© 2025 Curious Minds. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ── NAV SHRINK ON SCROLL ──
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  }, { passive: true });
+
+  // ── SCROLL REVEAL ──
+  const reveals = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => revealObserver.observe(el));
+
+  // ── COUNT-UP ANIMATION ──
+  function animateCount(el) {
+    const target = parseInt(el.dataset.target);
+    const duration = 1800;
+    const start = performance.now();
+    const update = (now) => {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+  }
+
+  const statsSection = document.getElementById('stats');
+  let counted = false;
+  const statsObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting && !counted) {
+      counted = true;
+      document.querySelectorAll('.count-up').forEach(animateCount);
+    }
+  }, { threshold: 0.5 });
+  statsObserver.observe(statsSection);
+
+  // ── CARD ROTATION ON HOVER ──
+  const cardFront = document.querySelector('.wisdom-card.card-front');
+  if (cardFront) {
+    cardFront.addEventListener('mousemove', e => {
+      const rect = cardFront.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / rect.width;
+      const dy = (e.clientY - cy) / rect.height;
+      cardFront.style.transform = `rotate(-1deg) perspective(800px) rotateX(${-dy * 8}deg) rotateY(${dx * 8}deg) translateY(-12px)`;
+    });
+    cardFront.addEventListener('mouseleave', () => {
+      cardFront.style.transform = '';
+    });
+  }
+</script>
 </body>
 </html>
